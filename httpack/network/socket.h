@@ -1,8 +1,8 @@
 #ifndef _CYZPP_NETWORK_SOCKET_H__
 #define _CYZPP_NETWORK_SOCKET_H__
 
-#include "common.h"
 #include <sys/socket.h>
+#include "common.h"
 #include "internet_address.h"
 
 CYZPP_BEGIN
@@ -26,25 +26,38 @@ class Socket {
 
   Socket(const Socket &) = delete;
 
-  Socket(Socket && sock);
+  Socket(Socket &&sock);
 
   Socket &operator=(const Socket &) = delete;
 
-  Socket &operator=(Socket && sock);
+  Socket &operator=(Socket &&sock);
+
+  ~Socket() {
+    if (valid()) close();
+  }
+
+  void enableTcpNoDelay(bool on);
+
+  void enableReuseAddr(bool on);
+
+  void enableReusePort(bool on);
+
+  void enableKeepAlive(bool on);
 
   bool valid() { return sockfd_ != -1; }
 
   sockfd_t nativeHandler() const { return sockfd_; }
 
-  void bind(const InternetAddress& address);
-  
+  void bind(const InternetAddress &address);
+
   void listen();
 
-  Socket accept(InternetAddress& address);
+  Socket accept(InternetAddress &address);
 
-  bool connect(const InternetAddress& address);
+  bool connect(const InternetAddress &address);
 
   void close();
+
 
  private:
   sockfd_t sockfd_;
@@ -52,4 +65,4 @@ class Socket {
 
 CYZPP_END
 
-#endif // _CYZPP_NETWORK_SOCKET_H__
+#endif  // _CYZPP_NETWORK_SOCKET_H__
