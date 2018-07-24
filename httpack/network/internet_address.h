@@ -16,6 +16,8 @@ class InternetAddress {
   typedef struct sockaddr_storage storage_t;
 
   enum class trans_opt { peer, local };
+
+  InternetAddress();
   
   InternetAddress(family_t family, const std::string &address, port_t port);
 

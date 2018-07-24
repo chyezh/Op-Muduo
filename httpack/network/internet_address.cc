@@ -5,6 +5,10 @@
 
 CYZPP_BEGIN
 
+InternetAddress::InternetAddress() {
+  bzero(&address_, sizeof(storage_t));
+}
+
 InternetAddress::InternetAddress(family_t family, const std::string &address,
                                  port_t port) {
   bzero(&address_, sizeof(storage_t));
