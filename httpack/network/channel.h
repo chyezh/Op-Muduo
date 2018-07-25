@@ -14,6 +14,18 @@ class Channel {
   typedef int SocketFD;
   typedef std::function<void()> EventCallback;
 
+  enum class Status {
+    NO_POLLER,
+    IN_POLLER,
+    POLLING
+  };
+
+  Channel(SocketFD fd, EventLoop* loop);
+
+  Channel(const Channel&) = delete;
+
+  Channel &operator=(const Channel&) = delete;
+
   // setter
   void setReadCallback(const EventCallback & call) { read_call_ = call; }
 
@@ -23,10 +35,17 @@ class Channel {
 
   void setREvents(PollEvents events) { events_ = events; }
 
-  PollEvents events() { return events_; }
+  void setStatus(Status status) { status_ = status; }
 
-  SocketFD sockfd() { return sockfd_; }
+  // getter
 
+  Status getStatus() const { return status_; }
+
+  PollEvents getEvents() const { return events_; }
+
+  SocketFD getSockfd() const { return sockfd_; }
+
+  // 
   void enableRead(bool on);
 
   void enableWrite(bool on);
@@ -47,6 +66,7 @@ class Channel {
   
   // owner event loop
   EventLoop* event_loop_;
+  Status status_;
 
   // event callback fucntion
   EventCallback read_call_;

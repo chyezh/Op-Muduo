@@ -1,5 +1,7 @@
 #include "poller.h"
 #include <stdio.h>
+#include <cassert>
+#include <cstring>
 #include <exception>
 #include "channel.h"
 
@@ -19,6 +21,7 @@ void Poller::poll(int timeout, ChannelList &poll_result_list) {
   if (events_num < 0) {
     if (errno != EINTR) {
       perror("Poller::poll error#");
+      return;
     }
   }
   if (events_num > 0) {
@@ -33,12 +36,62 @@ void Poller::poll(int timeout, ChannelList &poll_result_list) {
   }
 }
 
-void Poller::updateChannel(const Channel &channel) {
-  
+void Poller::updateChannel(Channel &channel) {
+  Channel::Status status = channel.getStatus();
+  // if channel do not have poller, add to this poller
+  if (status == Channel::Status::NO_POLLER) {
+    // add to poller
+    channel_list_[channel.getSockfd()] = &channel;
+    // if channel have interesting events
+    if (!channel.getEvents()) {
+      // add to epoll
+      update(EPOLL_CTL_ADD, channel);
+      channel.setStatus(Channel::Status::POLLING);
+    } else {
+      // not add to epoll
+      channel.setStatus(Channel::Status::IN_POLLER);
+    }
+    return;
+    // if channel has poller, update the status of channel
+  } else {
+    // if channel have interesting events
+    if (channel.getEvents()) {
+      // if polling, modify
+      if (status == Channel::Status::POLLING) update(EPOLL_CTL_MOD, channel);
+      // if in poll but not polling, add
+      else
+        update(EPOLL_CTL_ADD, channel);
+      // set status to polling
+      channel.setStatus(Channel::Status::POLLING);
+      // if channel has no interesting events, remove it from epoll
+    } else {
+      update(EPOLL_CTL_DEL, channel);
+      channel.setStatus(Channel::Status::IN_POLLER);
+    }
+  }
 }
 
-void Poller::removeChannel(const Channel &channel) {}
+void Poller::removeChannel(Channel &channel) {
+  Channel::Status status = channel.getStatus();
+  // channel must be control by this poller
+  assert(status != Channel::Status::NO_POLLER);
+  // if channel at polling state, remove it from epoll
+  if (status == Channel::Status::POLLING) update(EPOLL_CTL_DEL, channel);
+  channel.setStatus(Channel::Status::NO_POLLER);
+  // remove from this poller
+  channel_list_.erase(channel.getSockfd());
+}
 
-bool Poller::hasChannel(const Channel &channel) {}
+bool Poller::hasChannel(const Channel &channel) {
+  return channel_list_.find(channel.getSockfd()) != channel_list_.end();
+}
+
+void Poller::update(int op, Channel &channel) {
+  struct epoll_event new_event;
+  bzero(&new_event, sizeof(epoll_event));
+  new_event.data.ptr = static_cast<void *>(&channel);
+  new_event.events = channel.getEvents();
+  ::epoll_ctl(poll_id_, op, channel.getSockfd(), &new_event);
+}
 
 CYZPP_END

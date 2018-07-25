@@ -27,14 +27,15 @@ class Poller {
 
   void poll(int timeout, ChannelList& poll_result_list);
 
-  void updateChannel(const Channel &channel);
+  void updateChannel(Channel &channel);
 
-  void removeChannel(const Channel &channel);
+  void removeChannel(Channel &channel);
 
   bool hasChannel(const Channel &channel);
 
  private:
   // auxiliary function
+  void update(int op, Channel& channel);
 
   // Channel controlled by this Poller
   ChannelMap channel_list_;
@@ -42,8 +43,6 @@ class Poller {
   EventList event_list_;
 
   EventLoop* event_loop_;
-
-
 
   PollID poll_id_;
 };
