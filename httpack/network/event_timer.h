@@ -19,11 +19,13 @@ class EventTimer {
   static const TimePoint invalid_time_point;
 
   EventTimer(const EventCallback &call, TimePoint when, TimeDuration interval)
-      : expired_(when), interval_(interval), callback_(call), cycle_(false) {}
+      : expired_(when), interval_(interval), callback_(call), cycle_(interval > TimeDuration{0}) {}
 
   TimePoint getExpiration() const { return expired_; }
 
   void enableCycle(bool on) { cycle_ = on; }
+
+  bool isCycleTimer() { return cycle_; }
 
   void run() const { callback_(); }
 

@@ -40,6 +40,8 @@ class EventLoop {
 
   void runAfter(const Function &call, TimeDuration interval);
 
+  void runEvery(const Function &call, TimeDuration interval);
+
   void runInLoop(const Function &func);
 
   void queueInLoop(const Function &func);
@@ -57,6 +59,8 @@ class EventLoop {
   void assertIsLoopingThread();
 
   bool isLoopingThread();
+
+  bool isRunning();
 
  private:
   // can be controlled by other thread

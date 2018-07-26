@@ -52,7 +52,15 @@ void EventTimerQueue::addEventTimerInLoop(std::unique_ptr<EventTimer> timer) {
 void EventTimerQueue::runner() {
   // run the expired event
   auto expired_event_list = getExpiredTimer();
-  for (auto &&event : expired_event_list) event->run();
+  for (auto &&event : expired_event_list) {
+    // run the expired event
+    event->run();
+    // add cycle timer back to the list
+    if(event->isCycleTimer()) {
+      event->restart();
+      addEventTimerInLoop(std::move(event));
+    }
+  }
   // if some event is pending, update the timerfd
   if (!event_timer_map_.empty())
     updateTimerFD(event_timer_map_.begin()->first.first);
@@ -82,6 +90,7 @@ std::vector<std::unique_ptr<EventTimer>> EventTimerQueue::getExpiredTimer() {
   auto iter_not_expired = event_timer_map_.upper_bound(
       std::make_pair(now, std::numeric_limits<EventTimerID>::min()));
   std::vector<std::unique_ptr<EventTimer>> expired_event;
+
   for (auto iter = event_timer_map_.begin(); iter != iter_not_expired; ++iter) {
     expired_event.emplace_back(::std::move(iter->second));
   }

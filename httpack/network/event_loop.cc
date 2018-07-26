@@ -51,11 +51,15 @@ void EventLoop::loop() {
 }
 
 void EventLoop::runAt(const Function &call, TimePoint when) {
-  event_timer_queue_->addEventTimer(call, when, TimeDuration{});
+  event_timer_queue_->addEventTimer(call, when, TimeDuration{0});
 }
 
 void EventLoop::runAfter(const Function &call, TimeDuration interval) {
-  event_timer_queue_->addEventTimer(call, Clock::now() + interval, TimeDuration{});
+  event_timer_queue_->addEventTimer(call, Clock::now() + interval, TimeDuration{0});
+}
+
+void EventLoop::runEvery(const Function &call, TimeDuration interval) {
+  event_timer_queue_->addEventTimer(call, Clock::now() + interval, interval);
 }
 
 void EventLoop::runInLoop(const Function &func) {
@@ -112,6 +116,10 @@ void EventLoop::assertIsLoopingThread() {
 
 bool EventLoop::isLoopingThread() {
   return std::this_thread::get_id() == looping_thread_id_;
+}
+
+bool EventLoop::isRunning() {
+  return is_looping_;
 }
 
 CYZPP_END
