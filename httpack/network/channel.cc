@@ -5,11 +5,11 @@
 CYZPP_BEGIN
 
 Channel::Channel(SocketFD fd, EventLoop *loop)
-    : status_(Status::NO_POLLER),
+    : events_(0),
+      revents_(0),
       sockfd_(fd),
-      event_loop_(loop),
-      events_(0),
-      revents_(0) {}
+      owner_event_loop_(loop),
+      status_(Status::NO_POLLER) {}
 
 void Channel::enableRead(bool on) {
   if (on) {
@@ -19,6 +19,11 @@ void Channel::enableRead(bool on) {
   }
   updateState();
 }
+
+Channel::~Channel() {
+  owner_event_loop_->removeChannel(*this);
+}
+
 
 void Channel::enableWrite(bool on) {
   if (on) {
@@ -35,6 +40,6 @@ void Channel::handleEvents() {
   if ((revents_ & EPOLLOUT) && write_call_) write_call_();
 }
 
-void Channel::updateState() { event_loop_->updateChannel(this); }
+void Channel::updateState() { owner_event_loop_->updateChannel(*this); }
 
 CYZPP_END

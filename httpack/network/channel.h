@@ -1,7 +1,7 @@
 #ifndef _CYZPP_CHANNEL_H__
 #define _CYZPP_CHANNEL_H__
 
-#include "common.h"
+#include "../common.h"
 #include <functional>
 
 CYZPP_BEGIN
@@ -26,6 +26,8 @@ class Channel {
 
   Channel &operator=(const Channel&) = delete;
 
+  ~Channel();
+
   // setter
   void setReadCallback(const EventCallback & call) { read_call_ = call; }
 
@@ -33,7 +35,7 @@ class Channel {
 
   void setErrorCallback(const EventCallback & call) { error_call_ = call; }
 
-  void setREvents(PollEvents events) { events_ = events; }
+  void setREvents(PollEvents events) { revents_ = events; }
 
   void setStatus(Status status) { status_ = status; }
 
@@ -44,6 +46,8 @@ class Channel {
   PollEvents getEvents() const { return events_; }
 
   SocketFD getSockfd() const { return sockfd_; }
+
+  EventLoop* getOwnerLoop() const { return owner_event_loop_; }
 
   // 
   void enableRead(bool on);
@@ -65,12 +69,16 @@ class Channel {
   SocketFD sockfd_;
   
   // owner event loop
-  EventLoop* event_loop_;
+  EventLoop* owner_event_loop_;
+  
+  // channel current poller status
   Status status_;
 
   // event callback fucntion
   EventCallback read_call_;
+
   EventCallback write_call_;
+  
   EventCallback error_call_;
 };
 
