@@ -1,7 +1,7 @@
 #ifndef _CYZPP_POLLER_H__
 #define _CYZPP_POLLER_H__
 
-#include "common.h"
+#include "../common.h"
 #include <sys/epoll.h>
 #include <vector>
 #include <map>
@@ -9,6 +9,7 @@
 CYZPP_BEGIN
 
 class Channel;
+
 class EventLoop;
 
 class Poller {
@@ -33,6 +34,8 @@ class Poller {
 
   bool hasChannel(const Channel &channel);
 
+  EventLoop* getOwnerLoop() const { return owner_event_loop_; }
+
  private:
   // auxiliary function
   void update(int op, Channel& channel);
@@ -42,7 +45,7 @@ class Poller {
   // epoll return events
   EventList event_list_;
 
-  EventLoop* event_loop_;
+  EventLoop* owner_event_loop_;
 
   PollID poll_id_;
 };

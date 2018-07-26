@@ -1,0 +1,11 @@
+# .vscode
+.vscode
+
+# .out
+*.out
+
+# .a
+*.a
+
+# .o
+*.o

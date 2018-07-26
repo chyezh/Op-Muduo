@@ -3,7 +3,7 @@
 
 #include <netinet/in.h>
 #include <string>
-#include "common.h"
+#include "../common.h"
 
 CYZPP_BEGIN
 

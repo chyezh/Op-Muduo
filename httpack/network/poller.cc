@@ -7,12 +7,13 @@
 
 CYZPP_BEGIN
 
-Poller::Poller(EventLoop *loop) : event_loop_(loop) {
-  poll_id_ = epoll_create(0);
+Poller::Poller(EventLoop *loop) : owner_event_loop_(loop) {
+  poll_id_ = epoll_create(1024);
   if (poll_id_ < 0) {
-    perror("Poller construct fail#");
+    ERRLOG << "Poller construct fail\n";
     std::terminate();
   }
+  event_list_.resize(10);
 }
 
 void Poller::poll(int timeout, ChannelList &poll_result_list) {
@@ -20,8 +21,8 @@ void Poller::poll(int timeout, ChannelList &poll_result_list) {
       ::epoll_wait(poll_id_, event_list_.data(), event_list_.size(), timeout);
   if (events_num < 0) {
     if (errno != EINTR) {
-      perror("Poller::poll error#");
-      return;
+      ERRLOG  << "Poller::poll error\n";
+      std::terminate();
     }
   }
   if (events_num > 0) {
@@ -42,8 +43,8 @@ void Poller::updateChannel(Channel &channel) {
   if (status == Channel::Status::NO_POLLER) {
     // add to poller
     channel_list_[channel.getSockfd()] = &channel;
-    // if channel have interesting events
-    if (!channel.getEvents()) {
+    // if channel have interesting event
+    if (channel.getEvents()) {
       // add to epoll
       update(EPOLL_CTL_ADD, channel);
       channel.setStatus(Channel::Status::POLLING);
@@ -89,7 +90,7 @@ bool Poller::hasChannel(const Channel &channel) {
 void Poller::update(int op, Channel &channel) {
   struct epoll_event new_event;
   bzero(&new_event, sizeof(epoll_event));
-  new_event.data.ptr = static_cast<void *>(&channel);
+  new_event.data.ptr = &channel;
   new_event.events = channel.getEvents();
   ::epoll_ctl(poll_id_, op, channel.getSockfd(), &new_event);
 }
