@@ -39,12 +39,13 @@ void EventTimerQueue::addEventTimerInLoop(std::unique_ptr<EventTimer> timer) {
   owner_event_loop_->assertIsLoopingThread();
   // generate unique id for this timer
   EventTimerID timer_id = EventTimer::generateID();
+  EventTimer::TimePoint timer_expired = timer->getExpiration();
   // emplace the new timer to the map
-  event_timer_map_.emplace(std::make_pair(std::make_pair(timer->getExpiration(), timer_id),
+  event_timer_map_.emplace(std::make_pair(std::make_pair(timer_expired, timer_id),
                            std::move(timer)));
   // if new timer has most higher priority, update timerfd
   if (event_timer_map_.begin()->first.second == timer_id)
-    updateTimerFD(timer->getExpiration());
+    updateTimerFD(timer_expired);
 }
 
 // run the expired event
