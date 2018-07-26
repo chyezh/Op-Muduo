@@ -14,24 +14,30 @@ class Channel;
 
 class EventTimerQueue {
  public:
+  typedef typename EventTimer::EventCallback EventCallback;
   typedef typename EventTimer::Clock Clock;
   typedef typename EventTimer::TimePoint TimePoint;
+  typedef typename EventTimer::TimeDuration TimeDuration;
   typedef typename EventTimer::EventTimerID EventTimerID;
   typedef std::pair<TimePoint, EventTimerID> EventTimerKey;
-  typedef std::map<EventTimerKey, EventTimer> EventTimerMap;
+  typedef std::map<EventTimerKey, std::unique_ptr<EventTimer>> EventTimerMap;
 
   EventTimerQueue(EventLoop* loop);
+
+  ~EventTimerQueue();
 
   EventTimerQueue(const EventTimerQueue&) = delete;
 
   EventTimerQueue &operator=(const EventTimerQueue&) = delete;
 
-  void addEventTimer(const EventTimer& timer);
+  void addEventTimer(const EventCallback &call, TimePoint when, TimeDuration interval);
 
   void runner();
 
  private:
-  std::vector<EventTimer> getExpiredTimer();
+  std::vector<std::unique_ptr<EventTimer>> getExpiredTimer();
+
+  void addEventTimerInLoop(std::unique_ptr<EventTimer> timer);
 
   void updateTimerFD(TimePoint new_time);
 

@@ -45,10 +45,6 @@ class EventTimer {
   static std::atomic_uint64_t id_generator;
 };
 
-const EventTimer::TimePoint EventTimer::invalid_time_point = TimePoint::min();
-
-EventTimer::EventTimerID EventTimer::generateID() { return id_generator.fetch_add(1); }
-
 CYZPP_END
 
 #endif  // !_CYZPP_TIMER_H__
