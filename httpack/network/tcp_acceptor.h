@@ -11,13 +11,17 @@ class EventLoop;
 
 class TcpAcceptor {
  public:
-  typedef std::function<void(Socket&, InternetAddress&)> ConnectionCallback;
+  typedef std::function<void(Socket&, InternetAddress&)> ArrivedConnectionCallback;
 
   TcpAcceptor(EventLoop* loop, const InternetAddress& address);
 
+  TcpAcceptor(const TcpAcceptor &) = delete;
+
+  TcpAcceptor &operator=(const TcpAcceptor &) = delete;
+
   void listen();
 
-  void setConnectonCallback(const ConnectionCallback &call);
+  void setArrivedConnectonCallback(const ArrivedConnectionCallback &call);
 
  private:
   void accpetCallback();
@@ -26,7 +30,7 @@ class TcpAcceptor {
   Socket socket_;
   Channel acceptor_channel_;
   bool is_listenning_;
-  ConnectionCallback connection_callback_;
+  ArrivedConnectionCallback arrived_connection_callback_;
 };
 
 CYZPP_END

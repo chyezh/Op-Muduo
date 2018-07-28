@@ -1,6 +1,6 @@
 #include "socket.h"
-#include <unistd.h>
 #include <netinet/tcp.h>
+#include <unistd.h>
 
 CYZPP_BEGIN
 
@@ -25,8 +25,7 @@ Socket &Socket::operator=(Socket &&sock) {
 void Socket::enableTcpNoDelay(bool on) {
   int opt = on ? 1 : 0;
   ::setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int));
-  }
-
+}
 
 void Socket::enableReuseAddr(bool on) {
   int opt = on ? 1 : 0;

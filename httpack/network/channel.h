@@ -54,6 +54,8 @@ class Channel {
 
   void enableWrite(bool on);
 
+  void removeSelf();
+
   void handleEvents();
 
  private:
@@ -80,6 +82,8 @@ class Channel {
   EventCallback write_call_;
   
   EventCallback error_call_;
+
+  bool is_handling_;
 };
 
 CYZPP_END

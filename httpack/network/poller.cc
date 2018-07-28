@@ -4,6 +4,7 @@
 #include <cstring>
 #include <exception>
 #include "channel.h"
+#include "event_loop.h"
 
 CYZPP_BEGIN
 
@@ -17,6 +18,7 @@ Poller::Poller(EventLoop *loop) : owner_event_loop_(loop) {
 }
 
 void Poller::poll(int timeout, ChannelList &poll_result_list) {
+  owner_event_loop_->assertIsLoopingThread();
   int events_num =
       ::epoll_wait(poll_id_, event_list_.data(), event_list_.size(), timeout);
   if (events_num < 0) {
@@ -38,6 +40,7 @@ void Poller::poll(int timeout, ChannelList &poll_result_list) {
 }
 
 void Poller::updateChannel(Channel &channel) {
+  owner_event_loop_->assertIsLoopingThread();
   Channel::Status status = channel.getStatus();
   // if channel do not have poller, add to this poller
   if (status == Channel::Status::NO_POLLER) {
@@ -73,6 +76,7 @@ void Poller::updateChannel(Channel &channel) {
 }
 
 void Poller::removeChannel(Channel &channel) {
+  owner_event_loop_->assertIsLoopingThread();
   Channel::Status status = channel.getStatus();
   // channel must be control by this poller
   assert(status != Channel::Status::NO_POLLER);
@@ -88,6 +92,7 @@ bool Poller::hasChannel(const Channel &channel) {
 }
 
 void Poller::update(int op, Channel &channel) {
+  owner_event_loop_->assertIsLoopingThread();
   struct epoll_event new_event;
   bzero(&new_event, sizeof(epoll_event));
   new_event.data.ptr = &channel;

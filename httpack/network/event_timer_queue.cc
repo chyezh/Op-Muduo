@@ -35,6 +35,7 @@ void EventTimerQueue::addEventTimer(const EventCallback &call, TimePoint when, T
 }
 
 void EventTimerQueue::addEventTimerInLoop(std::unique_ptr<EventTimer> timer) {
+  owner_event_loop_->assertIsLoopingThread();
   // must run in looping thread
   owner_event_loop_->assertIsLoopingThread();
   // generate unique id for this timer
@@ -50,6 +51,7 @@ void EventTimerQueue::addEventTimerInLoop(std::unique_ptr<EventTimer> timer) {
 
 // run the expired event
 void EventTimerQueue::runner() {
+  owner_event_loop_->assertIsLoopingThread();
   // run the expired event
   auto expired_event_list = getExpiredTimer();
   for (auto &&event : expired_event_list) {

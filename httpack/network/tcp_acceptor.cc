@@ -31,15 +31,15 @@ void TcpAcceptor::listen() {
   is_listenning_ = true;
 }
 
-void TcpAcceptor::setConnectonCallback(const ConnectionCallback &call) {
-  connection_callback_ = call;
+void TcpAcceptor::setArrivedConnectonCallback(const ArrivedConnectionCallback &call) {
+  arrived_connection_callback_ = call;
 }
 
 void TcpAcceptor::accpetCallback() {
   owner_event_loop_->assertIsLoopingThread();
   InternetAddress accpet_address;
   Socket new_socket = socket_.accept(accpet_address);
-  connection_callback_(new_socket, accpet_address);  
+  arrived_connection_callback_(new_socket, accpet_address);  
 }
 
 CYZPP_END
