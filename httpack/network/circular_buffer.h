@@ -10,9 +10,15 @@ class CircularBuffer{
  public:
   CircularBuffer();
 
-  size_t readFrom(int sockfd);
+  ssize_t readFrom(int sockfd);
 
-  size_t read(char *buffer, size_t len);
+  ssize_t read(char *buffer, size_t len);
+
+  ssize_t writeTo(int sockfd);
+
+  ssize_t write(const char* buffer, int len);
+
+  size_t readableNumber() const { return data_.size() - rest_size_; }
 
  private:
   std::vector<char> data_;
