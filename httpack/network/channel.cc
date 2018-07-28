@@ -1,7 +1,7 @@
 #include "channel.h"
 #include <sys/epoll.h>
-#include "event_loop.h"
 #include <cassert>
+#include "event_loop.h"
 
 CYZPP_BEGIN
 
@@ -15,9 +15,16 @@ Channel::Channel(SocketFD fd, EventLoop *loop)
 
 Channel::~Channel() {
   assert(!is_handling_);
-  if(status_ != Status::NO_POLLER)
-    removeSelf();
+  if (status_ != Status::NO_POLLER) removeSelf();
   assert(status_ == Status::NO_POLLER);
+}
+
+bool Channel::isReading() {
+  return events_ & (EPOLLIN | EPOLLPRI);
+}
+
+bool Channel::isWriting() {
+  return events_ & (EPOLLOUT);
 }
 
 void Channel::enableRead(bool on) {

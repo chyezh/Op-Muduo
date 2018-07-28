@@ -49,7 +49,10 @@ class Channel {
 
   EventLoop* getOwnerLoop() const { return owner_event_loop_; }
 
-  // 
+  bool isWriting();
+
+  bool isReading();
+
   void enableRead(bool on);
 
   void enableWrite(bool on);
