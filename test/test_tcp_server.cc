@@ -1,19 +1,15 @@
-#include "../httpack/network/tcp_server.h"
-#include "../httpack/network/event_loop.h"
-#include "../httpack/network/tcp_connection.h"
 #include <string.h>
+#include "../Op-Muduo/network/event_loop.h"
+#include "../Op-Muduo/network/tcp_connection.h"
+#include "../Op-Muduo/network/tcp_server.h"
 
-void onConnecion(cyzpp::TcpConnectionPtr ptr) {
-    printf("on Connection: \n");
-}
-
-std::string s("fuck you\n");
+void onConnecion(cyzpp::TcpConnectionPtr ptr) { printf("on Connection: \n"); }
 
 void onMessage(cyzpp::TcpConnectionPtr ptr) {
   char data[128];
-  auto read_num = ptr->recv(data, 128);
-  ptr->send(s.data(), 10);
-  ptr->send(data, read_num);
+  size_t read_num = 0;
+  while((read_num = ptr->recv(data, 128)) != 0)
+    ptr->send(data, read_num);
 }
 
 int main() {
