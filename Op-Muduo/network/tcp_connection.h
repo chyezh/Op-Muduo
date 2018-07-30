@@ -50,6 +50,8 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   InternetAddress getPeerAddress() { return peer_; }
 
+  size_t getReadableNumber() { return read_buffer_.readableNumber(); }
+
   EventLoop *getOwnerLoop() { return owner_event_loop_; }
 
   size_t recv(char *buffer, size_t len);
