@@ -17,7 +17,7 @@ class EventLoopThread {
 
   EventLoopThread &operator=(const EventLoopThread &) = delete;
 
-  static EventLoop* makeEventLoop();
+  static std::pair<std::thread, EventLoop*> makeEventLoop();
 
  private:
   static void makeEventLoopFunc();

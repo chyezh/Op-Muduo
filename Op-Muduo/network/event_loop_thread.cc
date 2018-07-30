@@ -11,7 +11,7 @@ std::mutex EventLoopThread::mutex_;
 
 std::condition_variable EventLoopThread::cond_;
 
-EventLoop *EventLoopThread::makeEventLoop() {
+std::pair<std::thread, EventLoop*> EventLoopThread::makeEventLoop() {
   event_thread_ = std::thread(makeEventLoopFunc);
   // wait event_loop_ return
   std::unique_lock<std::mutex> lk(mutex_);
@@ -20,8 +20,7 @@ EventLoop *EventLoopThread::makeEventLoop() {
   EventLoop *new_event_loop = event_loop_;
   event_loop_ = nullptr;
   // detach the thread and return
-  event_thread_.detach();
-  return new_event_loop;
+  return std::make_pair(std::move(event_thread_), new_event_loop);
 }
 
 void EventLoopThread::makeEventLoopFunc() {

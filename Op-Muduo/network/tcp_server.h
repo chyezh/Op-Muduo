@@ -4,6 +4,7 @@
 #include <set>
 #include <memory>
 #include "tcp_acceptor.h"
+#include "event_loop_thread_pool.h"
 
 CYZPP_BEGIN
 
@@ -17,7 +18,7 @@ class TcpServer {
   typedef std::function<void(TcpConnectionPtr)> MessageCallback;
   typedef std::set<TcpConnectionPtr> TcpConnectionSet;
 
-  TcpServer(EventLoop *loop, const InternetAddress &address);
+  TcpServer(EventLoop *loop, const InternetAddress &address, size_t thread_num);
 
   TcpServer(const TcpServer &) = delete;
 
@@ -36,10 +37,15 @@ class TcpServer {
   void newConnectionArrived(Socket &sock, InternetAddress &address);
 
   void removeConnection(TcpConnectionPtr connection);
+  
+  void removeConnectionInLoop(TcpConnectionPtr connection);
 
   EventLoop *owner_event_loop_;
 
   TcpAcceptor acceptor_;
+
+  EventLoopThreadPool event_loop_pool_;
+
   TcpConnectionSet connection_set_;
 
   // callback for coming connection

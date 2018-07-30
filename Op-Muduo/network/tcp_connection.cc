@@ -4,6 +4,7 @@
 #include <cassert>
 #include "channel.h"
 #include "event_loop.h"
+#include "signal.h"
 
 CYZPP_BEGIN
 
@@ -124,5 +125,11 @@ void TcpConnection::destroyConnection() {
   channel_->enableWrite(false);
   channel_->removeSelf();
 }
+
+detail::EnvironmentInitializer::EnvironmentInitializer() {
+  ::signal(SIGPIPE, SIG_IGN);
+}
+
+detail::EnvironmentInitializer environment_initializer_object;
 
 CYZPP_END

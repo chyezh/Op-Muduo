@@ -48,6 +48,10 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   void setCloseCallback(const CloseCallback &call);
 
+  InternetAddress getPeerAddress() { return peer_; }
+
+  EventLoop *getOwnerLoop() { return owner_event_loop_; }
+
   size_t recv(char *buffer, size_t len);
 
   size_t recvNumber();
@@ -110,6 +114,18 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   // unique id generator
   static std::atomic_uint64_t id_generator;
+};
+
+namespace detail {
+  // initialize the connecton working environment
+  class EnvironmentInitializer {
+    public:
+     EnvironmentInitializer();
+
+     EnvironmentInitializer(const EnvironmentInitializer&) = delete;
+
+     EnvironmentInitializer& operator=(const EnvironmentInitializer&);
+  };
 };
 
 CYZPP_END
