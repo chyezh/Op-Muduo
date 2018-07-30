@@ -48,7 +48,7 @@ ssize_t CircularBuffer::readFrom(int sockfd) {
   return read_num;
 }
 
-ssize_t CircularBuffer::read(char *buffer, size_t len) {
+size_t CircularBuffer::read(char *buffer, size_t len) {
   char *data = data_.data();
   size_t total_size = data_.size();
   size_t exist_size = data_.size() - rest_size_;
@@ -114,7 +114,7 @@ ssize_t CircularBuffer::writeTo(int sockfd) {
   return write_num;
 }
 
-ssize_t CircularBuffer::write(const char* buffer, int len) {
+size_t CircularBuffer::write(const char* buffer, size_t len) {
   size_t total_size = data_.size();
   size_t exist_size = total_size - rest_size_;
   if(rest_size_ < len)

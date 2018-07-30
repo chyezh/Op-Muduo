@@ -26,8 +26,9 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   typedef uint64_t TcpConnectionID;
 
   enum class Status {
+    CONNECTING,
     CONNECTED,
-    ESTABLISHED,
+    DISCONNECTING,
     DISCONNECTED
   };
 
@@ -64,6 +65,9 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   // for close the connection
   void handleClose();
+
+  // destroy connection
+  void destroyConnection();
 
   // generate unique id for timer
   static TcpConnectionID generateID();

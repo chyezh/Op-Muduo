@@ -12,11 +12,11 @@ class CircularBuffer{
 
   ssize_t readFrom(int sockfd);
 
-  ssize_t read(char *buffer, size_t len);
+  size_t read(char *buffer, size_t len);
 
   ssize_t writeTo(int sockfd);
 
-  ssize_t write(const char* buffer, int len);
+  size_t write(const char* buffer, size_t len);
 
   size_t readableNumber() const { return data_.size() - rest_size_; }
 
